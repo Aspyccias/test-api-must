@@ -1,4 +1,7 @@
 
+# PHPStorm project
+.idea/
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -9,5 +12,11 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-# PHPStorm project
-.idea/
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+/bin/phpunit
+/tests/bootstrap.php
+/.env.test
