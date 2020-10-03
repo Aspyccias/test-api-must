@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: 'Test API Must Informatique'
+  description: 'This is a test API from Aurélien Soulard for Must Informatique'
+  version: '0.1'
+tags:
+  - name: admin
+    description: "Admin API to manage users"
+components:
+  schemas:
+    NewUser:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 25
+        login:
+          type: string
+          maxLength: 25
+        password:
+          type: string
+          maxLength: 25
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        login:
+          type: string
+paths:
+  /admin/user:
+    post:
+      tags:
+        - admin
+      description: 'Creates a user and returns it'
+      operationId: 'App\Controller\Admin\UserController::createUser'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing user information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad parameters
+        '500':
+          description: Unexpected error
+    get:
+      tags:
+        - admin
+      description: 'Returns all existing users'
+      operationId: 'App\Controller\Admin\UserController::getUsers'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Users array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Unexpected error
+  /admin/user/{userId}:
+    delete:
+      tags:
+        - admin
+      description: 'Deletes a user'
+      operationId: 'App\Controller\Admin\UserController::deleteUser'
+      produces:
+        - text/plain
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: User id to delete
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User not found
+        '500':
+          description: Unexpected error
