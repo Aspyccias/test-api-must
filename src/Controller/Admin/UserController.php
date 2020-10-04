@@ -19,7 +19,7 @@ class UserController extends AbstractController
      * @param UserRepository $userRepository
      * @return JsonResponse|Response
      */
-    public function getUsers(UserRepository $userRepository)
+    public function getAllAction(UserRepository $userRepository)
     {
         try {
             $users = $userRepository->findAll();
@@ -48,7 +48,7 @@ class UserController extends AbstractController
      * @param Request $request
      * @return JsonResponse|Response
      */
-    public function createUser(Request $request)
+    public function createAction(Request $request)
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -61,12 +61,6 @@ class UserController extends AbstractController
 
             $form->submit($data);
             if ($form->isValid()) {
-                $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($user);
-                $em->flush();
-
                 return $this->json(
                     [
                         'id' => $user->getId(),
@@ -79,7 +73,7 @@ class UserController extends AbstractController
 
             return new Response('Please provide valid user information', Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            return new Response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -89,7 +83,7 @@ class UserController extends AbstractController
      * @param User|null $user
      * @return Response
      */
-    public function deleteUser(?User $user)
+    public function deleteAction(?User $user)
     {
         try {
             if (is_null($user)) {

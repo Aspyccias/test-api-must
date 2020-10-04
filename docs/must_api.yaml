@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: 'Test API Must Informatique'
+  description: 'This is a test API from Aurélien Soulard for Must Informatique'
+  version: '0.1'
+tags:
+  - name: Admin
+    description: "Admin API to manage users (limited to local access)"
+  - name: Authentication
+    description: "Login and logout for Store API (public access)"
+components:
+  schemas:
+    NewUser:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 25
+        login:
+          type: string
+          maxLength: 25
+        password:
+          type: string
+          maxLength: 25
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        login:
+          type: string
+    UserLogin:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+paths:
+  /admin/user:
+    get:
+      tags:
+        - Admin
+      description: 'Returns all existing users'
+      operationId: 'App\Controller\Admin\UserController::getAllAction'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Users array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - Admin
+      description: 'Creates a user and returns it'
+      operationId: 'App\Controller\Admin\UserController::createAction'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing user information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad parameters
+  /admin/user/{userId}:
+    delete:
+      tags:
+        - Admin
+      description: 'Deletes a user'
+      operationId: 'App\Controller\Admin\UserController::deleteAction'
+      produces:
+        - text/plain
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: User id to delete
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User not found
+  /login:
+    post:
+      tags:
+        - Authentication
+      description: 'Login and get authentication token'
+      operationId: 'App\Controller\Authentication\AuthenticationController::loginAction'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing user login and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Authentication failed
+  /logout:
+    get:
+      tags:
+        - Authentication
+      description: 'Logout a user and delete his token'
+      operationId: 'App\Controller\Authentication\AuthenticationController::logoutAction'
+      parameters:
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Logout successful

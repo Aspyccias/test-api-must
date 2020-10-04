@@ -83,13 +83,22 @@ class User
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+        $encryptedPassword = password_hash($password, PASSWORD_DEFAULT);
+        if (!is_string($encryptedPassword)) {
+            throw new \RuntimeException('Password encryption failure');
+        }
+
+        $this->password = $encryptedPassword;
 
         return $this;
     }
 
     public function getApiToken(): ?string
     {
+        if ($this->getApiTokenExpiryDate() <= new \DateTime()) {
+            return null;
+        }
+
         return $this->apiToken;
     }
 

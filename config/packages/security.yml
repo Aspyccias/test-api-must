@@ -1,7 +1,10 @@
 security:
+  access_control:
+    - path: ^/admin$
+      allow_if: "request.getClientIp() not in [127.0.0.1,::1]"
   firewalls:
     main:
-      pattern: ^/api
+      pattern: ^/store
       anonymous: true
       lazy: true
       logout: ~
