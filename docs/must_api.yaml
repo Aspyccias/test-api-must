@@ -52,7 +52,7 @@ paths:
     get:
       tags:
         - Admin
-      description: 'Returns all existing users'
+      description: 'Return all existing users'
       operationId: 'App\Controller\Admin\UserController::getAllAction'
       produces:
         - application/json
@@ -68,7 +68,7 @@ paths:
     post:
       tags:
         - Admin
-      description: 'Creates a user and returns it'
+      description: 'Create a user and returns it'
       operationId: 'App\Controller\Admin\UserController::createAction'
       consumes:
         - application/json
@@ -93,10 +93,10 @@ paths:
     delete:
       tags:
         - Admin
-      description: 'Deletes a user'
+      description: 'Delete a user'
       operationId: 'App\Controller\Admin\UserController::deleteAction'
       produces:
-        - text/plain
+        - application/json
       parameters:
         - in: path
           name: userId
@@ -142,6 +142,8 @@ paths:
         - Authentication
       description: 'Logout a user and delete his token'
       operationId: 'App\Controller\Authentication\AuthenticationController::logoutAction'
+      produces:
+        - application/json
       parameters:
         - in: header
           name: MUST-API-TOKEN
@@ -155,7 +157,7 @@ paths:
     get:
       tags:
         - Store
-      description: 'Returns all existing brands'
+      description: 'Return all existing brands'
       operationId: 'App\Controller\Store\BrandController::getAllAction'
       parameters:
         - in: header
@@ -176,3 +178,105 @@ paths:
                   $ref: '#/components/schemas/Brand'
         '401':
           description: Unauthorized Access
+    post:
+      tags:
+        - Store
+      description: 'Create a brand'
+      operationId: 'App\Controller\Store\BrandController::createAction'
+      parameters:
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing the new brand information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Brand created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '401':
+          description: Authentication failed
+  /store/brands/{brandId}:
+    put:
+      tags:
+        - Store
+      description: 'Update a brand'
+      operationId: 'App\Controller\Store\BrandController::editAction'
+      parameters:
+        - in: path
+          name: brandId
+          schema:
+            type: integer
+          required: true
+          description: Brand id to update
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing the brand information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Brand updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '404':
+          description: Brand not found
+        '401':
+          description: Authentication failed
+
+    delete:
+      tags:
+        - Store
+      description: 'Delete a brand'
+      operationId: 'App\Controller\Store\BrandController::deleteAction'
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: brandId
+          schema:
+            type: integer
+          required: true
+          description: Brand id to delete
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Brand deleted
+        '404':
+          description: Brand not found
+        '401':
+          description: Authentication failed

@@ -100,7 +100,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = [
-            'message' => $exception->getMessageKey()
+            'message' => 'Authentication failed'
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);

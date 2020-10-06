@@ -13,11 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/admin/users")
+ */
 class UserController extends ApiController
 {
     /**
      * Get all existing users
-     * @Route("/admin/users", methods={"GET"})
+     * @Route("", methods={"GET"})
      * @param UserRepository $userRepository
      * @return JsonResponse|Response
      */
@@ -35,7 +38,7 @@ class UserController extends ApiController
      *   - name: string
      *   - login: string
      *   - password: string
-     * @Route("/admin/users", methods={"POST"})
+     * @Route("", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
      * @return JsonResponse|Response
@@ -68,7 +71,7 @@ class UserController extends ApiController
 
     /**
      * Delete a user
-     * @Route("/admin/users/{id}", methods={"DELETE"})
+     * @Route("/{id}", methods={"DELETE"})
      * @param User|null $user
      * @param EntityManagerInterface $entityManager
      * @return Response
