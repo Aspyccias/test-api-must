@@ -49,7 +49,6 @@ class Product
     /**
      * @ORM\ManyToMany(targetEntity=Category::class)
      * @ORM\JoinTable(
-     *     name="products_categories",
      *     joinColumns={@ORM\JoinColumn(onDelete="CASCADE")},
      *     inverseJoinColumns={@ORM\JoinColumn(onDelete="CASCADE")}
      * )
