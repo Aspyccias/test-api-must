@@ -37,9 +37,10 @@ class UserController extends ApiController
      *   - password: string
      * @Route("/admin/users", methods={"POST"})
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return JsonResponse|Response
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request, EntityManagerInterface $entityManager)
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -52,19 +53,22 @@ class UserController extends ApiController
 
             $form->submit($data);
             if ($form->isValid()) {
+                $entityManager->persist($user);
+                $entityManager->flush();
+
                 return $this->setStatusCode(Response::HTTP_CREATED)
                     ->respondWithItems($user, new UserTransformer());
             }
 
             return new Response('Please provide valid user information', Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            return $this->errorInternalError();
+            return $this->errorInternalError($e->getMessage());
         }
     }
 
     /**
      * Delete a user
-     * @Route("/admin/users/{userId}", methods={"DELETE"})
+     * @Route("/admin/users/{id}", methods={"DELETE"})
      * @param User|null $user
      * @param EntityManagerInterface $entityManager
      * @return Response
@@ -79,7 +83,7 @@ class UserController extends ApiController
             $entityManager->remove($user);
             $entityManager->flush();
 
-            return $this->noContentResponse('User deleted');
+            return $this->noContentResponse();
         } catch (\Exception $e) {
             return $this->errorInternalError();
         }

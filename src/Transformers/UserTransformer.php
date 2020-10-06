@@ -6,8 +6,9 @@ namespace App\Transformers;
 
 use App\Entity\User;
 use Doctrine\ORM\PersistentCollection;
+use League\Fractal\TransformerAbstract;
 
-class UserTransformer
+class UserTransformer extends TransformerAbstract
 {
     /**
      * @param User $user
@@ -17,7 +18,7 @@ class UserTransformer
     {
         return [
             'id' => $user->getId(),
-            'name' => $user->getUserName(),
+            'userName' => $user->getUserName(),
             'login' => $user->getLogin(),
         ];
     }

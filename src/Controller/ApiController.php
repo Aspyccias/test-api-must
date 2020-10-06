@@ -41,10 +41,10 @@ class ApiController extends AbstractController
         return $this;
     }
 
-    public function noContentResponse(string $message = '')
+    public function noContentResponse()
     {
         return $this->setStatusCode(Response::HTTP_NO_CONTENT)
-            ->respondWithArray($message);
+            ->respondWithArray();
     }
 
     /**
@@ -65,7 +65,7 @@ class ApiController extends AbstractController
      * @param array $headers
      * @return JsonResponse
      */
-    protected function respondWithArray($data, array $headers = []): JsonResponse
+    protected function respondWithArray($data = '', array $headers = []): JsonResponse
     {
         if ($data !== '' && !isset($data['error'])) {
             $data = ['data' => $data];

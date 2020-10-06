@@ -33,3 +33,6 @@ services:
     api_key_authenticator:
         class: App\Security\TokenAuthenticator
         autowire: true
+
+    League\Fractal\Manager:
+        autowire: true

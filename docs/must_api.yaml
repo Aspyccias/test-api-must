@@ -15,7 +15,7 @@ components:
     NewUser:
       type: object
       properties:
-        name:
+        userName:
           type: string
           maxLength: 25
         login:
@@ -29,7 +29,7 @@ components:
       properties:
         id:
           type: integer
-        name:
+        userName:
           type: string
         login:
           type: string
