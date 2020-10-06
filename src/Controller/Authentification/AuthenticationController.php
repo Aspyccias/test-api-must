@@ -2,14 +2,14 @@
 
 namespace App\Controller\Authentification;
 
+use App\Controller\ApiController;
 use App\Services\AuthenticationService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class AuthenticationController extends AbstractController
+class AuthenticationController extends ApiController
 {
     /**
      * Authenticate user with login and password and get a new token in response.
@@ -30,9 +30,9 @@ class AuthenticationController extends AbstractController
                 ]
             );
         } catch (\InvalidArgumentException $e) {
-            return new Response($e->getMessage(), Response::HTTP_UNAUTHORIZED);
+            return $this->errorUnauthorized($e->getMessage());
         } catch (\Exception $e) {
-            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorInternalError();
         }
     }
 
@@ -48,9 +48,9 @@ class AuthenticationController extends AbstractController
         try {
             $authenticationService->deleteToken($request);
 
-            return new Response('Logout successful');
+            return $this->respondWithArray('Logout successful');
         } catch (\Exception $e) {
-            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorInternalError();
         }
     }
 }

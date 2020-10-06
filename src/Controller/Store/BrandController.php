@@ -25,7 +25,7 @@ class BrandController extends ApiController
         try {
             return $this->respondWithItems($brandRepository->findAll(), new BrandTransformer());
         } catch (\Exception $e) {
-            $this->errorInternalError();
+            return $this->errorInternalError();
         }
     }
 }

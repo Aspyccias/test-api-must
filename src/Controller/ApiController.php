@@ -108,6 +108,16 @@ class ApiController extends AbstractController
      * @param string $message
      * @return JsonResponse
      */
+    protected function errorUnauthorized(string $message = 'Unauthorized access')
+    {
+        return $this->setStatusCode(Response::HTTP_UNAUTHORIZED)
+            ->respondWithError($message);
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
     protected function respondWithError(string $message): JsonResponse
     {
         return $this->respondWithArray(['error' => $message]);
