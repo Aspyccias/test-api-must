@@ -2,30 +2,31 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\ApiController;
 use App\Entity\User;
 use App\Form\UserType;
-use App\Services\UserService;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\UserRepository;
+use App\Transformers\UserTransformer;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class UserController extends AbstractController
+class UserController extends ApiController
 {
     /**
      * Get all existing users
      * @Route("/admin/users", methods={"GET"})
-     * @param UserService $userService
+     * @param UserRepository $userRepository
      * @return JsonResponse|Response
      */
-    public function getAllAction(UserService $userService)
+    public function getAllAction(UserRepository $userRepository)
     {
         try {
-            return $this->json($userService->getAllUsers());
+            return $this->respondWithItems($userRepository->findAll(), new UserTransformer());
         } catch (\Exception $e) {
-            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorInternalError();
         }
     }
 
@@ -43,7 +44,7 @@ class UserController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             if (is_null($data)) {
-                return new Response('Please provide valid user information', Response::HTTP_BAD_REQUEST);
+                return $this->errorBadRequest('Please provide valid user information');
             }
 
             $user = new User();
@@ -51,19 +52,13 @@ class UserController extends AbstractController
 
             $form->submit($data);
             if ($form->isValid()) {
-                return $this->json(
-                    [
-                        'id' => $user->getId(),
-                        'name' => $user->getUserName(),
-                        'login' => $user->getLogin(),
-                    ],
-                    Response::HTTP_CREATED
-                );
+                return $this->setStatusCode(Response::HTTP_CREATED)
+                    ->respondWithItems($user, new UserTransformer());
             }
 
             return new Response('Please provide valid user information', Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorInternalError();
         }
     }
 
@@ -71,19 +66,22 @@ class UserController extends AbstractController
      * Delete a user
      * @Route("/admin/users/{userId}", methods={"DELETE"})
      * @param User|null $user
-     * @param UserService $userService
+     * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    public function deleteAction(?User $user, UserService $userService)
+    public function deleteAction(?User $user, EntityManagerInterface $entityManager)
     {
         try {
-            if ($userService->deleteUser($user) === false) {
-                return new Response('Unknown user', Response::HTTP_NOT_FOUND);
+            if (is_null($user)) {
+                return $this->errorNotFound('Unknown user');
             }
 
-            return new Response('User deleted', Response::HTTP_NO_CONTENT);
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+            return $this->noContentResponse('User deleted');
         } catch (\Exception $e) {
-            return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorInternalError();
         }
     }
 }
