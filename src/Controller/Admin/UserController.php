@@ -4,7 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
+use App\Services\UserService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,25 +16,14 @@ class UserController extends AbstractController
 {
     /**
      * Get all existing users
-     * @Route("/admin/user", methods={"GET"})
-     * @param UserRepository $userRepository
+     * @Route("/admin/users", methods={"GET"})
+     * @param UserService $userService
      * @return JsonResponse|Response
      */
-    public function getAllAction(UserRepository $userRepository)
+    public function getAllAction(UserService $userService)
     {
         try {
-            $users = $userRepository->findAll();
-
-            $jsonUsers = [];
-            foreach ($users as $user) {
-                $jsonUsers[] = [
-                    'id' => $user->getId(),
-                    'name' => $user->getName(),
-                    'login' => $user->getLogin(),
-                ];
-            }
-
-            return $this->json($jsonUsers);
+            return $this->json($userService->getAllUsers());
         } catch (\Exception $e) {
             return new Response('Unexpected error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -44,7 +34,7 @@ class UserController extends AbstractController
      *   - name: string
      *   - login: string
      *   - password: string
-     * @Route("/admin/user", methods={"POST"})
+     * @Route("/admin/users", methods={"POST"})
      * @param Request $request
      * @return JsonResponse|Response
      */
@@ -64,7 +54,7 @@ class UserController extends AbstractController
                 return $this->json(
                     [
                         'id' => $user->getId(),
-                        'name' => $user->getName(),
+                        'name' => $user->getUserName(),
                         'login' => $user->getLogin(),
                     ],
                     Response::HTTP_CREATED
@@ -79,20 +69,17 @@ class UserController extends AbstractController
 
     /**
      * Delete a user
-     * @Route("/admin/user/{id}", methods={"DELETE"})
+     * @Route("/admin/users/{userId}", methods={"DELETE"})
      * @param User|null $user
+     * @param UserService $userService
      * @return Response
      */
-    public function deleteAction(?User $user)
+    public function deleteAction(?User $user, UserService $userService)
     {
         try {
-            if (is_null($user)) {
+            if ($userService->deleteUser($user) === false) {
                 return new Response('Unknown user', Response::HTTP_NOT_FOUND);
             }
-
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($user);
-            $em->flush();
 
             return new Response('User deleted', Response::HTTP_NO_CONTENT);
         } catch (\Exception $e) {

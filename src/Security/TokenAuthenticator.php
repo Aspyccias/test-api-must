@@ -11,21 +11,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
 
     /**
      * TokenAuthenticator constructor.
-     * @param EntityManagerInterface $em
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -70,7 +71,18 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
             return null;
         }
 
-        return $this->em->getRepository(User::class)->findOneBy(['apiToken' => $credentials]);
+        /** @var User $user */
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['apiToken' => $credentials]);
+
+        if (!is_null($user)) {
+            if ($user->isApiTokenExpired()) {
+                throw new CustomUserMessageAuthenticationException(
+                    'Token expired'
+                );
+            }
+        }
+
+        return $user;
     }
 
     /**
@@ -88,7 +100,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = [
-            'message' => 'You are not allowed to access this resource'
+            'message' => $exception->getMessageKey()
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);

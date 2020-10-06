@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthenticationService
 {
+    const TOKEN_TIMEOUT = 3600;
     /**
      * @var UserRepository
      */
@@ -59,14 +60,14 @@ class AuthenticationService
         }
 
         // Check if the token already exists and is not expired
-        if (!is_null($user->getApiToken())) {
+        if (!$user->isApiTokenExpired()) {
             $token = $user->getApiToken();
         } else {
             $token = bin2hex(random_bytes(60));
             $user->setApiToken($token);
         }
 
-        $user->setApiTokenExpiryDate(new \DateTime('+1 hour'));
+        $user->setApiTokenExpiryDate(new \DateTime('+'.self::TOKEN_TIMEOUT.' second'));
         $this->em->flush();
 
         return $token;

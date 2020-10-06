@@ -8,6 +8,8 @@ tags:
     description: "Admin API to manage users (limited to local access)"
   - name: Authentication
     description: "Login and logout for Store API (public access)"
+  - name: Store
+    description: "Store API to manage brands, categories and products (public access)"
 components:
   schemas:
     NewUser:
@@ -38,8 +40,15 @@ components:
           type: string
         password:
           type: string
+    Brand:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
 paths:
-  /admin/user:
+  /admin/users:
     get:
       tags:
         - Admin
@@ -49,7 +58,7 @@ paths:
         - application/json
       responses:
         '200':
-          description: Users array
+          description: Success
           content:
             application/json:
               schema:
@@ -80,7 +89,7 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: Bad parameters
-  /admin/user/{userId}:
+  /admin/users/{userId}:
     delete:
       tags:
         - Admin
@@ -142,3 +151,28 @@ paths:
       responses:
         '200':
           description: Logout successful
+  /store/brands:
+    get:
+      tags:
+        - Store
+      description: 'Returns all existing brands'
+      operationId: 'App\Controller\Store\BrandController::getAllAction'
+      parameters:
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Brand'
+        '401':
+          description: Unauthorized Access

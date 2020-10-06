@@ -5,12 +5,13 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -23,7 +24,7 @@ class User
      * @ORM\Column(type="string", length=25)
      * @Assert\NotBlank
      */
-    private string $name;
+    private string $userName;
 
     /**
      * @ORM\Column(type="string", length=25)
@@ -38,7 +39,7 @@ class User
     private string $password;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, unique=true, nullable=true)
      */
     private ?string $apiToken;
 
@@ -52,14 +53,14 @@ class User
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUserName(): ?string
     {
-        return $this->name;
+        return $this->userName;
     }
 
-    public function setName(string $name): self
+    public function setUserName(string $userName): self
     {
-        $this->name = $name;
+        $this->userName = $userName;
 
         return $this;
     }
@@ -95,10 +96,6 @@ class User
 
     public function getApiToken(): ?string
     {
-        if ($this->getApiTokenExpiryDate() <= new \DateTime()) {
-            return null;
-        }
-
         return $this->apiToken;
     }
 
@@ -119,5 +116,33 @@ class User
         $this->apiTokenExpiryDate = $apiTokenExpiryDate;
 
         return $this;
+    }
+
+    public function isApiTokenExpired(): bool
+    {
+        if (is_null($this->getApiToken())) {
+            return true;
+        }
+
+        if ($this->getApiTokenExpiryDate() <= new \DateTime()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getRoles()
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function eraseCredentials()
+    {
+        // Nothing.
     }
 }

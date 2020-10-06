@@ -31,5 +31,5 @@ services:
     # please note that last definitions always *replace* previous ones
 
     api_key_authenticator:
-        class: AppBundle\Security\TokenAuthenticator
-        arguments: [ "@router" ]
+        class: App\Security\TokenAuthenticator
+        autowire: true
