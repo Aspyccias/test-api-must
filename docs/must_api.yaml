@@ -2,7 +2,10 @@ openapi: 3.0.0
 info:
   title: 'Test API Must Informatique'
   description: 'This is a test API from Aurélien Soulard for Must Informatique'
-  version: '0.1'
+  version: '1.0'
+  license:
+    name: 'GPL-3.0'
+    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 tags:
   - name: Admin
     description: "Admin API to manage users (limited to local access)"
