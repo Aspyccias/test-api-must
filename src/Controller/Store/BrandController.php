@@ -22,7 +22,7 @@ class BrandController extends ApiController
      * Get all existing brands
      * @Route("", methods={"GET"})
      * @param BrandRepository $brandRepository
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function getAllAction(BrandRepository $brandRepository)
     {
@@ -38,7 +38,7 @@ class BrandController extends ApiController
      * @Route("", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function createAction(Request $request, EntityManagerInterface $entityManager)
     {
@@ -56,8 +56,7 @@ class BrandController extends ApiController
                 $entityManager->persist($brand);
                 $entityManager->flush();
 
-                return $this->setStatusCode(Response::HTTP_CREATED)
-                    ->respondWithItems($brand, new BrandTransformer());
+                return $this->createdResponse($brand, new BrandTransformer());
             }
 
             return $this->errorBadRequest('Please provide valid brand information');
@@ -92,8 +91,7 @@ class BrandController extends ApiController
             if ($form->isValid()) {
                 $entityManager->flush();
 
-                return $this->setStatusCode(Response::HTTP_CREATED)
-                    ->respondWithItems($brand, new BrandTransformer());
+                return $this->respondWithItems($brand, new BrandTransformer());
             }
 
             return $this->errorBadRequest('Please provide valid brand information');
@@ -108,7 +106,7 @@ class BrandController extends ApiController
      * @Route("/{id}", methods={"DELETE"})
      * @param Brand|null $brand
      * @param EntityManagerInterface $entityManager
-     * @return Response
+     * @return JsonResponse
      */
     public function deleteAction(?Brand $brand, EntityManagerInterface $entityManager)
     {

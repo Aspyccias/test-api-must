@@ -6,10 +6,13 @@ use App\Repository\UserRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity("login")
+ * @UniqueEntity(fields={"userName","login"})
  */
 class User implements UserInterface
 {
@@ -21,13 +24,13 @@ class User implements UserInterface
     private int $id;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string", length=25, unique=true)
      * @Assert\NotBlank
      */
     private string $userName;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string", length=25, unique=true)
      * @Assert\NotBlank
      */
     private string $login;

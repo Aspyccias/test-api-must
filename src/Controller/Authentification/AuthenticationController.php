@@ -6,7 +6,6 @@ use App\Controller\ApiController;
 use App\Services\AuthenticationService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AuthenticationController extends ApiController
@@ -17,14 +16,14 @@ class AuthenticationController extends ApiController
      * @Route("/login", methods={"POST"})
      * @param Request $request
      * @param AuthenticationService $authenticationService
-     * @return Response|JsonResponse
+     * @return JsonResponse
      */
     public function loginAction(Request $request, AuthenticationService $authenticationService)
     {
         try {
             $authenticationToken = $authenticationService->getToken($request);
 
-            return $this->json(
+            return $this->respondWithArray(
                 [
                     'token' => $authenticationToken,
                 ]
@@ -41,6 +40,7 @@ class AuthenticationController extends ApiController
      * @Route("/logout", methods={"GET"})
      * @param Request $request
      * @param AuthenticationService $authenticationService
+     * @return JsonResponse
      * @throws \Exception
      */
     public function logoutAction(Request $request, AuthenticationService $authenticationService)

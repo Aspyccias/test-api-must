@@ -12,6 +12,8 @@ tags:
     description: "Store API to manage brands (public access)"
   - name: Store/Categories
     description: "Store API to manage product categories (public access)"
+  - name: Store/Products
+    description: "Store API to manage products (public access)"
 components:
   schemas:
     NewUser:
@@ -55,6 +57,43 @@ components:
         id:
           type: integer
         name:
+          type: string
+    NewProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        description:
+          type: string
+          required: true
+        brand:
+          type: integer
+          required: true
+        categories:
+          type: array
+          items:
+            type: integer
+        url:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        brand:
+          $ref: '#/components/schemas/Brand'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        url:
+          type: string
+        md5:
           type: string
 paths:
   /admin/users:
@@ -412,5 +451,157 @@ paths:
           description: Category deleted
         '404':
           description: Category not found
+        '401':
+          description: Authentication failed
+  /store/products:
+    get:
+      tags:
+        - Store/Products
+      description: 'Return all existing products'
+      operationId: 'App\Controller\Store\ProductController::getAllAction'
+      parameters:
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized Access
+    post:
+      tags:
+        - Store/Products
+      description: 'Create a product'
+      operationId: 'App\Controller\Store\ProductController::createAction'
+      parameters:
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing the new product information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        '200':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Authentication failed
+  /store/products/{productId}:
+    get:
+      tags:
+        - Store/Products
+      description: 'Return one product'
+      operationId: 'App\Controller\Store\ProductController::getAction'
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: integer
+          required: true
+          description: Product id to fetch
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '401':
+          description: Unauthorized Access
+    put:
+      tags:
+        - Store/Products
+      description: 'Update a product'
+      operationId: 'App\Controller\Store\ProductController::editAction'
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: integer
+          required: true
+          description: Product id to update
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: A JSON object containing the new product information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '401':
+          description: Authentication failed
+    delete:
+      tags:
+        - Store/Products
+      description: 'Delete a product'
+      operationId: 'App\Controller\Store\ProductController::deleteAction'
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: integer
+          required: true
+          description: Product id to delete
+        - in: header
+          name: MUST-API-TOKEN
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Product deleted
+        '404':
+          description: Product not found
         '401':
           description: Authentication failed

@@ -7,9 +7,13 @@ use App\Entity\Category;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @UniqueEntity("name")
  */
 class Product
 {
@@ -21,22 +25,24 @@ class Product
     private int $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank
      */
     private string $name;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private bool $active;
+    private bool $active = false;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $url;
+    private string $url = '';
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank
      */
     private string $description;
 
@@ -48,12 +54,12 @@ class Product
 
     /**
      * @ORM\ManyToMany(targetEntity=Category::class)
-     * @ORM\JoinTable(
-     *     joinColumns={@ORM\JoinColumn(onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(onDelete="CASCADE")}
+     * @ORM\JoinTable(name="product_category",
+     *      joinColumns={@ORM\JoinColumn(name="product_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="category_id", referencedColumnName="id")}
      * )
      */
-    private ArrayCollection $categories;
+    private $categories;
 
     /**
      * Product constructor.
@@ -117,11 +123,19 @@ class Product
     }
 
     /**
-     * @return \App\Entity\Brand
+     * @return Brand
      */
-    public function getBrand(): \App\Entity\Brand
+    public function getBrand(): Brand
     {
         return $this->brand;
+    }
+
+    /**
+     * @param Brand $brand
+     */
+    public function setBrand(Brand $brand): void
+    {
+        $this->brand = $brand;
     }
 
     /**
@@ -139,4 +153,30 @@ class Product
     {
         $this->categories = $categories;
     }
+
+//    /**
+//     * @param Category $category
+//     * @return $this
+//     */
+//    public function addCategory(Category $category)
+//    {
+//        if (!$this->getCategories()->contains($category)) {
+//            $this->getCategories()->add($category);
+//        }
+//
+//        return $this;
+//    }
+//
+//    /**
+//     * @param Category $category
+//     * @return $this
+//     */
+//    public function removeCategory(Category $category)
+//    {
+//        if ($this->getCategories()->contains($category)) {
+//            $this->getCategories()->removeElement($category);
+//        }
+//
+//        return $this;
+//    }
 }

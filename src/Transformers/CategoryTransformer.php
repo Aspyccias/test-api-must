@@ -5,6 +5,7 @@ namespace App\Transformers;
 
 
 use App\Entity\Category;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use League\Fractal\TransformerAbstract;
 
@@ -23,7 +24,7 @@ class CategoryTransformer extends TransformerAbstract
     }
 
     /**
-     * @param Category|PersistentCollection $categories
+     * @param Category|PersistentCollection|ArrayCollection $categories
      * @return array
      */
     public function transform($categories)

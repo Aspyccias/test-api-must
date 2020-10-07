@@ -22,7 +22,7 @@ class CategoryController extends ApiController
      * Get all existing categories
      * @Route("", methods={"GET"})
      * @param CategoryRepository $categoryRepository
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function getAllAction(CategoryRepository $categoryRepository)
     {
@@ -38,7 +38,7 @@ class CategoryController extends ApiController
      * @Route("", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function createAction(Request $request, EntityManagerInterface $entityManager)
     {
@@ -56,8 +56,7 @@ class CategoryController extends ApiController
                 $entityManager->persist($category);
                 $entityManager->flush();
 
-                return $this->setStatusCode(Response::HTTP_CREATED)
-                    ->respondWithItems($category, new CategoryTransformer());
+                return $this->createdResponse($category, new CategoryTransformer());
             }
 
             return $this->errorBadRequest('Please provide valid category information');
@@ -92,8 +91,7 @@ class CategoryController extends ApiController
             if ($form->isValid()) {
                 $entityManager->flush();
 
-                return $this->setStatusCode(Response::HTTP_CREATED)
-                    ->respondWithItems($category, new CategoryTransformer());
+                return $this->respondWithItems($category, new CategoryTransformer());
             }
 
             return $this->errorBadRequest('Please provide valid category information');
@@ -108,7 +106,7 @@ class CategoryController extends ApiController
      * @Route("/{id}", methods={"DELETE"})
      * @param Category|null $category
      * @param EntityManagerInterface $entityManager
-     * @return Response
+     * @return JsonResponse
      */
     public function deleteAction(?Category $category, EntityManagerInterface $entityManager)
     {

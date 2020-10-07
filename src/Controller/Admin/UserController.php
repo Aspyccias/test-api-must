@@ -22,7 +22,7 @@ class UserController extends ApiController
      * Get all existing users
      * @Route("", methods={"GET"})
      * @param UserRepository $userRepository
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function getAllAction(UserRepository $userRepository)
     {
@@ -41,7 +41,7 @@ class UserController extends ApiController
      * @Route("", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function createAction(Request $request, EntityManagerInterface $entityManager)
     {
@@ -59,11 +59,10 @@ class UserController extends ApiController
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                return $this->setStatusCode(Response::HTTP_CREATED)
-                    ->respondWithItems($user, new UserTransformer());
+                return $this->createdResponse($user, new UserTransformer());
             }
 
-            return new Response('Please provide valid user information', Response::HTTP_BAD_REQUEST);
+            return $this->errorBadRequest('Please provide valid user information');
         } catch (\Exception $e) {
             return $this->errorInternalError($e->getMessage());
         }
@@ -74,7 +73,7 @@ class UserController extends ApiController
      * @Route("/{id}", methods={"DELETE"})
      * @param User|null $user
      * @param EntityManagerInterface $entityManager
-     * @return Response
+     * @return JsonResponse
      */
     public function deleteAction(?User $user, EntityManagerInterface $entityManager)
     {

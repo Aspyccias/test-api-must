@@ -7,10 +7,12 @@ use App\Repository\BrandRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BrandRepository::class)
+ * @UniqueEntity("name")
  */
 class Brand
 {
@@ -22,7 +24,7 @@ class Brand
     private int $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      */
     private string $name;
@@ -56,13 +58,5 @@ class Brand
         $this->name = $name;
 
         return $this;
-    }
-
-    /**
-     * @return PersistentCollection
-     */
-    public function getProducts()
-    {
-        return $this->products;
     }
 }

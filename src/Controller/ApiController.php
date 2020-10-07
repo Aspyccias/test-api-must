@@ -41,6 +41,17 @@ class ApiController extends AbstractController
         return $this;
     }
 
+    /**
+     * @param mixed $item The object to transform
+     * @param mixed $callback The transformer to call
+     * @return JsonResponse
+     */
+    public function createdResponse($item, $callback)
+    {
+        return $this->setStatusCode(Response::HTTP_CREATED)
+            ->respondWithItems($item, $callback);
+    }
+
     public function noContentResponse()
     {
         return $this->setStatusCode(Response::HTTP_NO_CONTENT)
@@ -48,8 +59,8 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @param $item mixed The object to transform
-     * @param $callback mixed The transformer to call
+     * @param mixed $item The object to transform
+     * @param mixed $callback The transformer to call
      * @return JsonResponse
      */
     protected function respondWithItems($item, $callback)
